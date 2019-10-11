@@ -1,0 +1,12 @@
+- Scrolling background
+  - Parallax
+- Player character movement
+  - Forward
+  - Jump
+  - Powerup (charge)
+- Camera follow
+- Game rules
+  - Speed up on jump
+  - Slow down on player hit
+- Level generation
+- Input manager
