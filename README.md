@@ -9,7 +9,8 @@ Currently no gameplay of any sort, just an exploration of visuals and audio aest
 
 ## Credits
 
-* All code, art, game design done by Diogo de Andrade
+* Code, art, game design done by Diogo de Andrade
+* Beat detection by Allan Pichardo (https://github.com/allanpichardo/Unity-Beat-Detection)
 * Music "Infiltrators" by Nathaniel Wyvern (https://nathanielwyvern.bandcamp.com) - Used by kind permission
 * Font "Neon Glow"  by Weknow Font Foundry
 
