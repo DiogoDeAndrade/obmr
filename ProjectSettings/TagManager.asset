@@ -36,11 +36,17 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - PostProcessVolume
   m_SortingLayers:
   - name: StaticBackground
     uniqueID: 3429461849
     locked: 0
+  - name: ScrollingBackground
+    uniqueID: 2734803043
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Character
+    uniqueID: 4200538167
     locked: 0

@@ -8,3 +8,4 @@ Library/*
 *.DS_Store
 obj/*
 Logs/*
+Builds/*
