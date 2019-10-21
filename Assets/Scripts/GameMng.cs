@@ -11,6 +11,9 @@ public class GameMng : MonoBehaviour
     public TextMeshProUGUI countdownPrefab;
     public TextMeshProUGUI countdownGoPrefab;
     public RectTransform   countdownTarget;
+    public AudioClip       countdownSound;
+    public AudioClip       countdownDone;
+    public AudioClip       playerJoinSound;
     [Header("Players")]
     public Character            characterPrefab;
     public Transform[]          playerSpawnPoint;
@@ -27,6 +30,7 @@ public class GameMng : MonoBehaviour
     float                      timeToStart;
     BackgroundManager[]        backgroundLayers;
     float                      currentSpeed = 0.0f;
+    float                      minSpeed = 0.0f;
 
     private void Awake()
     {
@@ -59,9 +63,11 @@ public class GameMng : MonoBehaviour
 
         if (gameState == GameState.Playing)
         {
-            float desiredSpeed = GetAverageSpeed();
+            ComputeMinSpeed();
 
-            currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) * 0.1f * Time.deltaTime;
+            float desiredSpeed = GetMinSpeed();
+
+            currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) * 0.2f;
 
             SetGlobalSpeed(currentSpeed);
         }
@@ -70,6 +76,8 @@ public class GameMng : MonoBehaviour
         {
             playerScores[i].text = string.Format("{0:000000}", Mathf.FloorToInt(players[i].score));
         }
+
+        OneButton.UpdateButtons();
     }
 
     void RunCountdown()
@@ -82,12 +90,16 @@ public class GameMng : MonoBehaviour
         {
             if (curTime == 0)
             {
+                SoundManager.PlaySound(SoundManager.SoundType.SoundFX, countdownDone, 1, 1);
+
                 var countdown = Instantiate(countdownGoPrefab, countdownTarget);
                 countdown.text = "GO!";
                 StartRunning();
             }
             else
             {
+                SoundManager.PlaySound(SoundManager.SoundType.SoundFX, countdownSound, 0.75f, 0.7f - curTime * 0.05f);
+
                 var countdown = Instantiate(countdownPrefab, countdownTarget);
                 countdown.text = "" + curTime;
             }
@@ -101,9 +113,9 @@ public class GameMng : MonoBehaviour
             var button = OneButton.GetButtonPress();
             if (button != null)
             {
-                JoinPlayer(button);
+                JoinPlayer(button); 
                 if (gameState == GameState.Title) StartPrepare();
-                timeToStart = 10;
+                timeToStart = 7;
             }
         }
     }
@@ -123,6 +135,8 @@ public class GameMng : MonoBehaviour
         players.Add(newChar);
 
         CameraCtrl.Shake(0.15f, 20.0f);
+
+        SoundManager.PlaySound(SoundManager.SoundType.SoundFX, playerJoinSound, 1, 1 + 0.05f * players.Count);
     }
 
     void StartTitle()
@@ -155,6 +169,10 @@ public class GameMng : MonoBehaviour
     void StartRunning()
     {
         gameState = GameState.Playing;
+        foreach (var player in players)
+        {
+            player.speed = 800.0f;
+        }
     }
 
     void EnableMenu(bool b)
@@ -175,15 +193,19 @@ public class GameMng : MonoBehaviour
         }
     }
 
-    float GetAverageSpeed()
+    void ComputeMinSpeed()
     {
-        float avgSpeed = 0.0f;
+        minSpeed = players[0].speed;
+
         foreach (var player in players)
         {
-            avgSpeed += player.speed;
+            minSpeed = Mathf.Min(minSpeed, player.speed);
         }
-        avgSpeed /= players.Count;
-
-        return avgSpeed;
     }
+
+    public float GetMinSpeed()
+    {
+        return minSpeed;
+    }
+    
 }

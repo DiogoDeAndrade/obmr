@@ -4,12 +4,19 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
+    [Header("Game Params")]
+    public float        acceleration = 500.0f;
+    public float        breakVelocity = 200.0f;
+    public float        maxSpeed = 1000.0f;
+    public float        jumpVelocity = 250.0f;
+    public int          maxJumpCount = 2;
     [Header("Player prefs")]
     public Color          playerColor;
     [Header("References")]
     public SpriteRenderer   eyeLeft;
     public SpriteRenderer   eyeRight;
     public ParticleSystem   burstParticleSystem;
+    public Transform        groundCheck;
     [Header("Runtime")]
     public OneButton      button;
     public float          speed = 0.0f;
@@ -18,12 +25,16 @@ public class Character : MonoBehaviour
 
     SpriteRenderer  playerBaseSprite;
     Vector2         currentEyeDir;
+    Rigidbody2D     rigidBody;
+    int             jumpCount;
+    int             currentJumpCount;
 
     // Start is called before the first frame update
     void Start()
     {
         playerBaseSprite = GetComponent<SpriteRenderer>();
         playerBaseSprite.color = playerColor;
+        rigidBody = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
@@ -42,10 +53,49 @@ public class Character : MonoBehaviour
                 EyesLookRandom();
                 break;
             case GameMng.GameState.Playing:
+                Play();
                 break;
             default:
                 break;
         }
+    }
+
+    void Play()
+    {
+        if (speed < maxSpeed)
+        {
+            speed = Mathf.Clamp(speed + acceleration * Time.deltaTime, 0.0f, maxSpeed);
+        }
+        else
+        {
+            speed = speed - breakVelocity * Time.deltaTime;
+        }
+
+        bool       isGrounded = false;
+        Collider2D collider = Physics2D.OverlapCircle(groundCheck.transform.position, 5.0f, LayerMask.GetMask("Ground"));
+        if (collider != null)
+        {
+            jumpCount = maxJumpCount;
+            isGrounded = true;
+        }
+
+        Vector2 currentVelocity = rigidBody.velocity;
+
+        if (button.IsTapped())
+        {
+            if (jumpCount > 0)
+            {
+                currentVelocity = new Vector2(0.0f, jumpVelocity);
+                speed = speed + 100.0f;
+                jumpCount--;
+            }
+        }
+
+        EyesLookTo(new Vector2(speed * 0.25f, currentVelocity.y));
+
+        currentVelocity.x = speed - GameMng.instance.GetMinSpeed();
+
+        rigidBody.velocity = currentVelocity;
     }
 
     public void EyesBeat()
@@ -79,6 +129,8 @@ public class Character : MonoBehaviour
 
     void EyesLookTo(Vector2 direction)
     {
+        direction = direction.normalized;
+
         float radius = 6;
 
         eyeLeft.transform.localPosition = radius * direction;

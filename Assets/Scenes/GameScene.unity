@@ -450,6 +450,9 @@ MonoBehaviour:
   countdownGoPrefab: {fileID: 4873089804918156231, guid: 9d6f211d4f2d8aa46946a4d788c28923,
     type: 3}
   countdownTarget: {fileID: 1842134118}
+  countdownSound: {fileID: 8300000, guid: 3dc66bb6e02fed34c87263d3f7e6e455, type: 3}
+  countdownDone: {fileID: 8300000, guid: b9fe0cfff08d66547bab98ca934c9359, type: 3}
+  playerJoinSound: {fileID: 8300000, guid: 9336e397c845a5b4d945eaaea07a2b28, type: 3}
   characterPrefab: {fileID: 6327494823805329386, guid: 63e68a2ceaeba4d42ab3c2023290197d,
     type: 3}
   playerSpawnPoint:
@@ -1456,7 +1459,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1115321200}
   - component: {fileID: 1115321199}
-  m_Layer: 0
+  - component: {fileID: 1115321202}
+  - component: {fileID: 1115321201}
+  m_Layer: 10
   m_Name: Ground
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1525,6 +1530,53 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &1115321201
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115321198}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!61 &1115321202
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1115321198}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 256, y: 256}
+    newSize: {x: 2.56, y: 2.56}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 256, y: 256}
+  m_EdgeRadius: 0
 --- !u!1 &1208703981
 GameObject:
   m_ObjectHideFlags: 0
@@ -1867,6 +1919,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cf12a0836f9a1a45a123b7722ae8464, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mixerSoundFX: {fileID: -9213190859626866778, guid: bdb67015ae6226c43a2b24d9de347cc1,
+    type: 2}
 --- !u!4 &1515910234
 Transform:
   m_ObjectHideFlags: 0

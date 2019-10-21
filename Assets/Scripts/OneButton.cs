@@ -4,12 +4,53 @@ using UnityEngine;
 
 public class OneButton
 {
-    enum Type { Key, Mouse, Gamepad };
+    enum Type { Key, Gamepad };
 
     Type    type;
     KeyCode key;
+    bool    currentPress;
+    float   timeLastPress;
+    float   timeLastRelease;
+    bool    isTapped;
+
+    public void Update()
+    {
+        bool prevPress = currentPress;
+
+        isTapped = false;
+
+        switch (type)
+        {
+            case Type.Key:
+                currentPress = Input.GetKey(key);
+                if ((!prevPress) && (currentPress)) timeLastPress = Time.realtimeSinceStartup;
+                if ((prevPress) && (!currentPress))
+                {
+                    timeLastRelease = Time.realtimeSinceStartup;
+                    if ((timeLastRelease - timeLastPress) < 0.5f) isTapped = true;
+                }
+                break;
+            case Type.Gamepad:
+                break;
+            default:
+                break;
+        }
+    }
+
+    public bool IsTapped()
+    {
+        return isTapped;
+    }
 
     static List<OneButton>  currentButtons = new List<OneButton>();
+
+    static public void UpdateButtons()
+    {
+        foreach (var b in currentButtons)
+        {
+            b.Update();
+        }
+    }
 
     static public void ClearButtons()
     {
