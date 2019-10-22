@@ -55,10 +55,17 @@ public class BackgroundManager : MonoBehaviour
         }
         buildingsToDelete.Clear();
 
-        var lastBuilding = buildings[buildings.Count - 1];
-        if (lastBuilding.bounds.max.x < (cameraLimitX + margin))
+        if (buildings.Count > 0)
         {
-            buildings.Add(CreateBuilding(lastBuilding.bounds.max.x));
+            var lastBuilding = buildings[buildings.Count - 1];
+            if (lastBuilding.bounds.max.x < (cameraLimitX + margin))
+            {
+                buildings.Add(CreateBuilding(lastBuilding.bounds.max.x));
+            }
+        }
+        else
+        {
+            buildings.Add(CreateBuilding(cameraLimitX));
         }
     }
 

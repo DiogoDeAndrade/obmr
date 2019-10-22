@@ -56,20 +56,18 @@ public class GameMng : MonoBehaviour
                 RunCountdown();
                 break;
             case GameState.Playing:
+                {
+                    ComputeMinSpeed();
+
+                    float desiredSpeed = GetMinSpeed() * 1.1f;
+
+                    currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) * 0.2f;
+
+                    SetGlobalSpeed(currentSpeed);
+                }
                 break;
             default:
                 break;
-        }
-
-        if (gameState == GameState.Playing)
-        {
-            ComputeMinSpeed();
-
-            float desiredSpeed = GetMinSpeed();
-
-            currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) * 0.2f;
-
-            SetGlobalSpeed(currentSpeed);
         }
 
         for (int i = 0; i < players.Count; i++)
@@ -207,5 +205,9 @@ public class GameMng : MonoBehaviour
     {
         return minSpeed;
     }
-    
+
+    public float GetCurrentSpeed()
+    {
+        return currentSpeed;
+    }
 }

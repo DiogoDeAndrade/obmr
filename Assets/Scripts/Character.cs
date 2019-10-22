@@ -5,17 +5,14 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     [Header("Game Params")]
-    public float        acceleration = 500.0f;
-    public float        breakVelocity = 200.0f;
-    public float        maxSpeed = 1000.0f;
-    public float        jumpVelocity = 250.0f;
-    public int          maxJumpCount = 2;
+    public GameParams   gameParams;
     [Header("Player prefs")]
     public Color          playerColor;
     [Header("References")]
     public SpriteRenderer   eyeLeft;
     public SpriteRenderer   eyeRight;
     public ParticleSystem   burstParticleSystem;
+    public ParticleSystem   jumpParticleSystem;
     public Transform        groundCheck;
     [Header("Runtime")]
     public OneButton      button;
@@ -35,6 +32,8 @@ public class Character : MonoBehaviour
         playerBaseSprite = GetComponent<SpriteRenderer>();
         playerBaseSprite.color = playerColor;
         rigidBody = GetComponent<Rigidbody2D>();
+
+        SetPSColor(jumpParticleSystem, playerColor);
     }
 
     // Update is called once per frame
@@ -62,20 +61,20 @@ public class Character : MonoBehaviour
 
     void Play()
     {
-        if (speed < maxSpeed)
+        if (speed < gameParams.maxSpeed)
         {
-            speed = Mathf.Clamp(speed + acceleration * Time.deltaTime, 0.0f, maxSpeed);
+            speed = Mathf.Clamp(speed + gameParams.acceleration * Time.deltaTime, 0.0f, gameParams.maxSpeed);
         }
         else
         {
-            speed = speed - breakVelocity * Time.deltaTime;
+            speed = speed - gameParams.breakVelocity * Time.deltaTime;
         }
 
         bool       isGrounded = false;
         Collider2D collider = Physics2D.OverlapCircle(groundCheck.transform.position, 5.0f, LayerMask.GetMask("Ground"));
         if (collider != null)
         {
-            jumpCount = maxJumpCount;
+            jumpCount = gameParams.maxJumpCount;
             isGrounded = true;
         }
 
@@ -85,15 +84,17 @@ public class Character : MonoBehaviour
         {
             if (jumpCount > 0)
             {
-                currentVelocity = new Vector2(0.0f, jumpVelocity);
-                speed = speed + 100.0f;
+                jumpParticleSystem.Play();
+
+                currentVelocity = new Vector2(0.0f, gameParams.jumpVelocity);
+                speed = speed + speed * gameParams.speedBoostJump;
                 jumpCount--;
             }
         }
 
         EyesLookTo(new Vector2(speed * 0.25f, currentVelocity.y));
 
-        currentVelocity.x = speed - GameMng.instance.GetMinSpeed();
+        currentVelocity.x = speed - GameMng.instance.GetCurrentSpeed();
 
         rigidBody.velocity = currentVelocity;
     }
@@ -138,12 +139,17 @@ public class Character : MonoBehaviour
         currentEyeDir = direction;
     }
 
+    public void SetPSColor(ParticleSystem ps, Color c)
+    {
+        var mainDefs = ps.main;
+        var startColor = mainDefs.startColor;
+        startColor.color = c;
+        mainDefs.startColor = startColor;
+    }
+
     public void RunSpawnFX()
     {
-        var mainDefs = burstParticleSystem.main;
-        var startColor = mainDefs.startColor;
-        startColor.color = playerColor;
-        mainDefs.startColor = startColor;
+        SetPSColor(burstParticleSystem, playerColor);
 
         burstParticleSystem.Play();
     }
