@@ -42,6 +42,16 @@ public class OneButton
         return isTapped;
     }
 
+    public bool IsPressed()
+    {
+        return currentPress;
+    }
+
+    public float GetTimeSincePress()
+    {
+        return Time.realtimeSinceStartup - timeLastPress;
+    }
+
     static List<OneButton>  currentButtons = new List<OneButton>();
 
     static public void UpdateButtons()

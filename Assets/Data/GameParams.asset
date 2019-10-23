@@ -12,9 +12,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbaf3f05843334c449b9753fd6b5a31f, type: 3}
   m_Name: GameParams
   m_EditorClassIdentifier: 
+  maxSpeed: 2500
   acceleration: 500
   breakVelocity: 400
-  maxSpeed: 2000
+  stdAccelerationMaxSpeed: 2000
   jumpVelocity: 1200
   maxJumpCount: 2
   speedBoostJump: 0.2
+  dashBarColor: {r: 0, g: 0.7137255, b: 1, a: 1}
+  maxDashCharge: 100
+  dashChargeSpeed: 200
+  dashDischargeSpeed: 600
+  speedBoostDash: 100
+  velocityBoostDash: 2500
+  gravityScaleChargeDash: 0.05
+  gravityScaleDash: 0.25
+  healthBarColor: {r: 0.1981132, g: 0.7924528, b: 0.1981132, a: 1}
+  maxHealth: 100

@@ -19,6 +19,7 @@ public class GameMng : MonoBehaviour
     public Transform[]          playerSpawnPoint;
     public Color[]              playerColors;
     public TextMeshProUGUI[]    playerScores;
+    public UIBar[]              uiBars;
 
     public static GameMng instance;
 
@@ -43,6 +44,17 @@ public class GameMng : MonoBehaviour
         StartTitle();
     }
 
+    public int SortByXOp(Character c1, Character c2)
+    {
+        float x1 = c1.transform.position.x;
+        float x2 = c2.transform.position.x;
+
+        if (System.Math.Abs(x1 - x2) < 0.00001f) return 0;
+        else if (x1 < x2) return 1;
+
+        return -1;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -61,14 +73,18 @@ public class GameMng : MonoBehaviour
 
                     float desiredSpeed = GetMinSpeed() * 1.1f;
 
-                    currentSpeed = currentSpeed + (desiredSpeed - currentSpeed) * 0.2f;
+                    currentSpeed += (desiredSpeed - currentSpeed) * 0.2f;
 
                     SetGlobalSpeed(currentSpeed);
+
+                    UpdateScore();
                 }
                 break;
             default:
                 break;
         }
+
+        
 
         for (int i = 0; i < players.Count; i++)
         {
@@ -76,6 +92,21 @@ public class GameMng : MonoBehaviour
         }
 
         OneButton.UpdateButtons();
+    }
+
+    void UpdateScore()
+    {
+        List<Character> positions = new List<Character>(players);
+
+        positions.Sort(SortByXOp);
+
+        float multiplier = 10.0f;
+
+        foreach (var c in positions)
+        {
+            c.score += multiplier * Time.deltaTime;
+            multiplier *= 0.75f;
+        }
     }
 
     void RunCountdown()
@@ -130,6 +161,11 @@ public class GameMng : MonoBehaviour
         playerScores[players.Count].gameObject.SetActive(true);
         playerScores[players.Count].color = newChar.playerColor;
 
+        uiBars[players.Count].gameObject.SetActive(true);
+        uiBars[players.Count].character = newChar;
+
+        newChar.uiBar = uiBars[players.Count];
+
         players.Add(newChar);
 
         CameraCtrl.Shake(0.15f, 20.0f);
@@ -153,6 +189,10 @@ public class GameMng : MonoBehaviour
         foreach (var ps in playerScores)
         {
             ps.gameObject.SetActive(false);
+        }
+        foreach (var bar in uiBars)
+        {
+            bar.gameObject.SetActive(false);
         }
     }
 
