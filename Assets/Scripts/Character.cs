@@ -37,6 +37,7 @@ public class Character : MonoBehaviour
     int             jumpCount;
     bool            isDashing;
     bool            canDash = true;
+    float           invulnerabilityTimer = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -87,6 +88,9 @@ public class Character : MonoBehaviour
 
     void Play()
     {
+        if (invulnerabilityTimer > 0)
+            invulnerabilityTimer -= Time.deltaTime;
+
         if (speed < gameParams.stdAccelerationMaxSpeed)
         {
             ChangeSpeed(gameParams.acceleration * Time.deltaTime);
@@ -183,21 +187,35 @@ public class Character : MonoBehaviour
                 dashRenderer.emitting = false;
         }
 
-        if (currentVelocity.y < 0)
+        if (!IsInvulnerable())
         {
-            collider = Physics2D.OverlapCircle(groundCheck.transform.position, 20.0f, LayerMask.GetMask("Character"));
-            if (collider != null)
+            if (currentVelocity.y < 0)
             {
-                Character otherCharacter = collider.GetComponent<Character>();
-                if ((otherCharacter) && (otherCharacter != this))
+                collider = Physics2D.OverlapCircle(groundCheck.transform.position, 20.0f, LayerMask.GetMask("Character"));
+                if (collider != null)
                 {
-                    currentVelocity.y = gameParams.jumpVelocity;
-                    jumpParticleSystem.Play();
-                    score += gameParams.hitOnHeadScore;
+                    if (HitAnotherPlayer(collider, gameParams.hitOnHeadScore, gameParams.hitOnHeadDamage, gameParams.hitOnHeadSpeedDown))
+                    {
+                        jumpParticleSystem.Play();
+                        currentVelocity.y = gameParams.jumpVelocity;
+                    }
+                }
+            }
 
-                    otherCharacter.DealDamage(gameParams.hitOnHeadDamage);
-                    otherCharacter.RunOvercharge();
-                    otherCharacter.ChangeSpeed(-gameParams.hitOnHeadSpeedDown);
+            if (isDashing)
+            {
+                float boxWidth = 150.0f;
+                var boxCenter = transform.position + new Vector3(boxWidth * 0.5f, 0.0f, 0.0f);
+
+                var colliders = Physics2D.OverlapBoxAll(boxCenter, new Vector2(boxWidth, 128), 0, LayerMask.GetMask("Character"));
+                bool hit = false;
+                foreach (var col in colliders)
+                {
+                    hit |= HitAnotherPlayer(col, gameParams.hitOnDashScore, gameParams.hitOnDashDamage, gameParams.hitOnDashSpeedDown);
+                }
+                if (hit)
+                {
+                    burstParticleSystem.Play();
                 }
             }
         }
@@ -210,8 +228,38 @@ public class Character : MonoBehaviour
         speed = Mathf.Clamp(speed + deltaSpeed, 0, gameParams.maxSpeed);
     }
 
+    bool HitAnotherPlayer(Collider2D collider, float scoreInc, float damage, float speedPenalty)
+    {
+        Character otherCharacter = collider.GetComponent<Character>();
+        if ((otherCharacter) && (otherCharacter != this))
+        {
+            if ((otherCharacter.isDead) ||
+                (otherCharacter.IsInvulnerable()))
+            {
+                return false;
+            }
+
+            score += scoreInc;
+
+            otherCharacter.DealDamage(damage);
+            otherCharacter.RunOvercharge();
+            otherCharacter.ChangeSpeed(-speedPenalty);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool IsInvulnerable()
+    {
+        return invulnerabilityTimer > 0;
+    }
+
     public void DealDamage(float damage)
     {
+        if (IsInvulnerable()) return;
+
         health -= damage;
 
         if (health <= 0)
@@ -222,6 +270,8 @@ public class Character : MonoBehaviour
             HideChar();
             EnableColliders(false);
         }
+
+        invulnerabilityTimer = 1.0f;
     }
 
     public void EnableColliders(bool b)

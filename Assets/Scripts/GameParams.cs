@@ -51,4 +51,7 @@ public class GameParams : ScriptableObject
     public float hitOnHeadScore = 200.0f;
     public float hitOnHeadDamage = 30;
     public float hitOnHeadSpeedDown = 1000.0f;
+    public float hitOnDashScore = 400.0f;
+    public float hitOnDashDamage = 50;
+    public float hitOnDashSpeedDown = 1000.0f;
 }
