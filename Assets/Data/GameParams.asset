@@ -40,14 +40,23 @@ MonoBehaviour:
   - 140
   - 380
   - 620
-  platformProbability: 0.5
+  platformProbability: 1
   blockDamage: 20
-  blockStartTime: 15
+  blockStartTime: 25
   blockInterval: 0.5
   blockProbability: 0.1
   blockProbabilityOverTime: 0.001
+  powerupStartTime: 5
+  powerupProbability: 1
+  powerupRate: 5
   mineDamage: 50
-  mineStartTime: 5
+  mineStartTime: 60
   mineInterval: 1
-  mineProbability: 0.25
-  mineProbabilityOverTime: 0.001
+  mineProbability: 0.4
+  mineProbabilityOverTime: 0.01
+  hitOnHeadScore: 200
+  hitOnHeadDamage: 30
+  hitOnHeadSpeedDown: 1000
+  hitOnDashScore: 400
+  hitOnDashDamage: 50
+  hitOnDashSpeedDown: 1000

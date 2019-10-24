@@ -102,8 +102,6 @@ public class OneButton
 
                         currentButtons.Add(b);
 
-                        Debug.Log("Added " + b.key);
-
                         return b;
                     }
                 }

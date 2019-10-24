@@ -41,6 +41,10 @@ public class GameParams : ScriptableObject
     public float    blockInterval = 0.25f;
     public float    blockProbability = 1.0f;
     public float    blockProbabilityOverTime = 0.0f;
+    [Header("Powerups")]
+    public float    powerupStartTime = 30.0f;
+    public float    powerupProbability = 1.0f;
+    public float    powerupRate = 5.0f;
     [Header("Mines")]
     public float mineDamage = 15.0f;
     public float mineStartTime = 5.0f;

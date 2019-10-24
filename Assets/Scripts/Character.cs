@@ -38,10 +38,13 @@ public class Character : MonoBehaviour
     bool            isDashing;
     bool            canDash = true;
     float           invulnerabilityTimer = 0.0f;
+    Collider2D      mainCollider;
+    Coroutine       dropDownCR;
 
     // Start is called before the first frame update
     void Start()
     {
+        mainCollider = GetComponent<Collider2D>();
         playerBaseSprite = GetComponent<SpriteRenderer>();
         playerBaseSprite.color = playerColor;
         rigidBody = GetComponent<Rigidbody2D>();
@@ -104,10 +107,13 @@ public class Character : MonoBehaviour
         Collider2D collider = Physics2D.OverlapCircle(groundCheck.transform.position, 5.0f, LayerMask.GetMask("Ground"));
         if (collider != null)
         {
-            jumpCount = gameParams.maxJumpCount;
-            dashCharge = 0.0f;
-            isGrounded = true;
-            canDash = true;
+            if (dropDownCR == null)
+            {
+                jumpCount = gameParams.maxJumpCount;
+                dashCharge = 0.0f;
+                isGrounded = true;
+                canDash = true;
+            }
         }
 
         Vector2 currentVelocity = rigidBody.velocity;
@@ -147,6 +153,16 @@ public class Character : MonoBehaviour
 
                         RunOvercharge();
                     }
+                }
+            }
+            else
+            {
+                if ((button.GetTimeSincePress() > 0.5f) && (transform.position.y > -280.0f) && (dropDownCR == null))
+                {
+                    // Drop down
+                    dropDownCR = StartCoroutine(DropDownCR());
+                    canDash = false;
+                    currentVelocity.y = gameParams.jumpVelocity * 0.25f;
                 }
             }
         }
@@ -223,6 +239,17 @@ public class Character : MonoBehaviour
         rigidBody.velocity = currentVelocity;
     }
 
+    IEnumerator DropDownCR()
+    {
+        mainCollider.enabled = false;
+
+        yield return new WaitForSeconds(0.5f);
+
+        mainCollider.enabled = true;
+
+        dropDownCR = null;
+    }
+
     void ChangeSpeed(float deltaSpeed)
     {
         speed = Mathf.Clamp(speed + deltaSpeed, 0, gameParams.maxSpeed);
@@ -256,11 +283,16 @@ public class Character : MonoBehaviour
         return invulnerabilityTimer > 0;
     }
 
+    public void Heal(float gain)
+    {
+        health = Mathf.Clamp(health + gain, 0, gameParams.maxHealth);
+    }
+
     public void DealDamage(float damage)
     {
         if (IsInvulnerable()) return;
 
-        health -= damage;
+        health = Mathf.Clamp(health - damage, 0, gameParams.maxHealth);
 
         if (health <= 0)
         {

@@ -35,6 +35,8 @@ public class GameMng : MonoBehaviour
     public Block                blockPrefab;
     [Header("Mines")]
     public Mine                 minePrefab;
+    [Header("Powerups")]
+    public Powerup[]            powerupPrefabs;
 
     public static GameMng instance;
 
@@ -54,6 +56,7 @@ public class GameMng : MonoBehaviour
     Platform[]                 platforms;
     float                      mineSpawnTimer = 0.0f;
     float                      mineProbability = 0.0f;
+    float                      powerupSpawnTime = 0.0f;
     bool                       canStart = false;
 
     private void Awake()
@@ -138,6 +141,7 @@ public class GameMng : MonoBehaviour
                             UpdatePlatforms();
                             UpdateBlocks();
                             UpdateMines();
+                            UpdatePowerups();
                         }
                     }
                 }
@@ -434,9 +438,9 @@ public class GameMng : MonoBehaviour
 
         float p = Random.Range(0.0f, 1.0f);
 
-        if (p > mineProbability) return;
-
         mineSpawnTimer = gameParams.mineInterval;
+
+        if (p > mineProbability) return;
 
         float x = GetPlayfieldLimitX() * 0.5f;
         x = Random.Range(0, x);
@@ -444,6 +448,57 @@ public class GameMng : MonoBehaviour
         Vector3 pos = new Vector3(x, baseCamera.transform.position.y + baseCamera.orthographicSize + 50.0f, 0.0f);
 
         Instantiate(minePrefab, pos, Quaternion.identity);
+    }
+
+    void UpdatePowerups()
+    {
+        if (raceTime < gameParams.powerupStartTime) return;
+
+        powerupSpawnTime -= Time.deltaTime;
+
+        if (powerupSpawnTime > 0) return;
+
+        powerupSpawnTime = gameParams.powerupRate;
+
+        float p = Random.Range(0.0f, 1.0f);
+
+        if (p > gameParams.powerupProbability) return;
+
+        int r = Random.Range(0, platforms.Length);
+
+        float y = 0.0f;
+        float width = 0.0f;
+        float maxWidth = 2048;
+
+        if (platforms[r] != null)
+        {
+            y = gameParams.platformHeight[r];
+            width = (platforms[r].transform.position.x + platforms[r].size.x) - GetPlayfieldLimitX();
+
+            if (width < 0) return;
+            else
+            {
+                width = Mathf.Min(width, maxWidth);
+            }
+        }
+        else
+        {
+            y = -320;
+            width = maxWidth * 0.5f;
+        }
+
+        float x = 0.0f;
+
+        var prefab = powerupPrefabs[Random.Range(0, powerupPrefabs.Length)];
+
+        while (x < width)
+        {
+            Vector3 pos = new Vector3(x + GetPlayfieldLimitX(), y + 64.0f, 0.0f);
+
+            Instantiate(prefab, pos, Quaternion.identity);
+
+            x += 128.0f;
+        }
     }
 
     void EndRace()
