@@ -16,6 +16,7 @@ public class Character : MonoBehaviour
     public ParticleSystem   jumpParticleSystem;
     public ParticleSystem   dashParticleSystem;
     public ParticleSystem   explodeParticleSystem;
+    public ParticleSystem   chargeParticleSystem;
     public Transform        groundCheck;
     public Transform        barAnchor;
     public TrailRenderer    dashRenderer;
@@ -55,6 +56,7 @@ public class Character : MonoBehaviour
         SetPSColor(jumpParticleSystem, playerColor);
         SetPSColor(dashParticleSystem, playerColor);
         SetPSColor(explodeParticleSystem, playerColor);
+        SetPSColor(chargeParticleSystem, playerColor);
         ghostCharacter.SetColor(playerColor);
     }
 
@@ -109,6 +111,7 @@ public class Character : MonoBehaviour
         {
             if (dropDownCR == null)
             {
+                EnableChargeFX(false);
                 jumpCount = gameParams.maxJumpCount;
                 dashCharge = 0.0f;
                 isGrounded = true;
@@ -141,6 +144,8 @@ public class Character : MonoBehaviour
 
                 dashCharge = Mathf.Min(dashCharge + Time.deltaTime * gameParams.dashChargeSpeed, gameParams.maxDashCharge);
 
+                EnableChargeFX(true);
+
                 if (gameParams.overchargeExplode)
                 {
                     if (dashCharge >= gameParams.maxDashCharge)
@@ -152,11 +157,15 @@ public class Character : MonoBehaviour
                         DealDamage(gameParams.overchargeDamage);
 
                         RunOvercharge();
+
+                        EnableChargeFX(false);
                     }
                 }
             }
             else
             {
+                EnableChargeFX(false);
+
                 if ((button.GetTimeSincePress() > 0.5f) && (transform.position.y > -280.0f) && (dropDownCR == null))
                 {
                     // Drop down
@@ -170,6 +179,7 @@ public class Character : MonoBehaviour
         {
             if (!isDashing)
             {
+                EnableChargeFX(false);
                 canDash = false;
                 jumpCount = 0;
                 isDashing = true;
@@ -183,6 +193,8 @@ public class Character : MonoBehaviour
         }
         else
         {
+            EnableChargeFX(false);
+
             isDashing = false;
             dashCharge = 0.0f;
             rigidBody.gravityScale = 1.0f;
@@ -419,6 +431,12 @@ public class Character : MonoBehaviour
         }
 
         ghostCharacter.RunSpin();
+    }
+
+    void EnableChargeFX(bool b)
+    {
+        var emission = chargeParticleSystem.emission;
+        emission.enabled = b;
     }
     #endregion
 }
