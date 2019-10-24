@@ -9,14 +9,17 @@ public class Character : MonoBehaviour
     [Header("Player prefs")]
     public Color playerColor;
     [Header("References")]
+    public Transform        eyesBase;
     public SpriteRenderer   eyeLeft;
     public SpriteRenderer   eyeRight;
     public ParticleSystem   burstParticleSystem;
     public ParticleSystem   jumpParticleSystem;
     public ParticleSystem   dashParticleSystem;
+    public ParticleSystem   explodeParticleSystem;
     public Transform        groundCheck;
     public Transform        barAnchor;
     public TrailRenderer    dashRenderer;
+    public GhostCharacter   ghostCharacter;
     [Header("Runtime")]
     public OneButton    button;
     public float        health;
@@ -31,6 +34,7 @@ public class Character : MonoBehaviour
     Rigidbody2D     rigidBody;
     int             jumpCount;
     bool            isDashing;
+    bool            canDash = true;
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +48,8 @@ public class Character : MonoBehaviour
 
         SetPSColor(jumpParticleSystem, playerColor);
         SetPSColor(dashParticleSystem, playerColor);
+        SetPSColor(explodeParticleSystem, playerColor);
+        ghostCharacter.SetColor(playerColor);
     }
 
     // Update is called once per frame
@@ -87,6 +93,7 @@ public class Character : MonoBehaviour
             jumpCount = gameParams.maxJumpCount;
             dashCharge = 0.0f;
             isGrounded = true;
+            canDash = true;
         }
 
         Vector2 currentVelocity = rigidBody.velocity;
@@ -104,7 +111,7 @@ public class Character : MonoBehaviour
                 dashCharge = 0.0f;
             }
         }
-        else if ((button.IsPressed()) && (button.GetTimeSincePress() > 0.1f))
+        else if ((button.IsPressed()) && (button.GetTimeSincePress() > 0.1f) && (canDash))
         {
             if (!isGrounded)
             {
@@ -114,39 +121,49 @@ public class Character : MonoBehaviour
 
                 dashCharge = Mathf.Min(dashCharge + Time.deltaTime * gameParams.dashChargeSpeed, gameParams.maxDashCharge);
 
-                uiBar.mode = UIBar.Mode.Dash;
+                if (gameParams.overchargeExplode)
+                {
+                    if (dashCharge >= gameParams.maxDashCharge)
+                    {
+                        dashCharge = 0;
+                        canDash = false;
+
+                        speed = speed - gameParams.overchargePenaltySpeed;
+                        health = health - gameParams.overchargeDamage;
+
+                        RunOvercharge();
+                    }
+                }
             }
         }
         else if (dashCharge > 0)
         {
             if (!isDashing)
             {
+                canDash = false;
                 jumpCount = 0;
                 isDashing = true;
                 ChangeSpeed(gameParams.speedBoostDash * speed);
                 currentVelocity.y = gameParams.jumpVelocity * 0.5f;
-                dashRenderer.emitting = true;
-                dashParticleSystem.Play();
-                var emission = dashParticleSystem.emission;
-                emission.enabled = true;
-                CameraCtrl.Shake(0.15f, 20.0f);
+
+                RunDashFX();
             }           
             dashCharge -= gameParams.dashDischargeSpeed * Time.deltaTime;           
             rigidBody.gravityScale = gameParams.gravityScaleDash;           
         }
         else
         {
-            var emission = dashParticleSystem.emission;
-            emission.enabled = false;
-            dashRenderer.emitting = false;
             isDashing = false;
             dashCharge = 0.0f;
-            if (uiBar.mode == UIBar.Mode.Dash) uiBar.mode = UIBar.Mode.None;
             rigidBody.gravityScale = 1.0f;
-            
+
+            StopDashFX();
         }
 
-        EyesLookTo(new Vector2(speed * 0.25f, currentVelocity.y));
+        if (isDashing)
+            EyesLookTo(new Vector2(1.0f, 0.0f));
+        else
+            EyesLookTo(new Vector2(speed * 0.25f, currentVelocity.y));
 
         currentVelocity.x = speed - GameMng.instance.GetCurrentSpeed();
         if (isDashing)
@@ -159,6 +176,12 @@ public class Character : MonoBehaviour
         rigidBody.velocity = currentVelocity;
     }
 
+    void ChangeSpeed(float deltaSpeed)
+    {
+        speed = Mathf.Clamp(speed + deltaSpeed, 0, gameParams.maxSpeed);
+    }
+
+    #region Eyes
     public void EyesBeat()
     {
         EyesLookTo(new Vector2(1, 1).normalized);
@@ -198,7 +221,9 @@ public class Character : MonoBehaviour
         eyeRight.transform.localPosition = radius * direction;
         currentEyeDir = direction;
     }
+    #endregion
 
+    #region FX
     public void SetPSColor(ParticleSystem ps, Color c)
     {
         var mainDefs = ps.main;
@@ -214,8 +239,30 @@ public class Character : MonoBehaviour
         burstParticleSystem.Play();
     }
 
-    void ChangeSpeed(float deltaSpeed)
+    public void RunDashFX()
     {
-        speed = Mathf.Min(speed + deltaSpeed, gameParams.maxSpeed);
+        dashRenderer.emitting = true;
+        dashParticleSystem.Play();
+        var emission = dashParticleSystem.emission;
+        emission.enabled = true;
+        CameraCtrl.Shake(0.15f, 20.0f);
+        eyesBase.localScale = new Vector3(1.5f, 1.5f, 1.0f);
     }
+
+    public void StopDashFX()
+    {
+        var emission = dashParticleSystem.emission;
+        emission.enabled = false;
+        dashRenderer.emitting = false;
+        eyesBase.localScale = new Vector3(1.0f, 1.0f, 1.0f);
+    }
+
+    public void RunOvercharge()
+    {
+        ghostCharacter.RunShock();
+        explodeParticleSystem.Play();
+        burstParticleSystem.Play();
+        CameraCtrl.Shake(0.25f, 50.0f);
+    }
+    #endregion
 }

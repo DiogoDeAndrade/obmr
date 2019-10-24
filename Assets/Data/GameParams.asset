@@ -27,5 +27,8 @@ MonoBehaviour:
   velocityBoostDash: 2500
   gravityScaleChargeDash: 0.05
   gravityScaleDash: 0.25
+  overchargeExplode: 1
+  overchargePenaltySpeed: 1000
+  overchargeDamage: 25
   healthBarColor: {r: 0.1981132, g: 0.7924528, b: 0.1981132, a: 1}
   maxHealth: 100

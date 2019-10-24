@@ -23,6 +23,9 @@ public class GameParams : ScriptableObject
     public float    velocityBoostDash = 300.0f;
     public float    gravityScaleChargeDash = 0.1f;
     public float    gravityScaleDash = 0.0f;
+    public bool     overchargeExplode = true;
+    public float    overchargePenaltySpeed = 1000.0f;
+    public float    overchargeDamage = 0.0f;
     [Header("Health")]
     public Color    healthBarColor = Color.green;
     public float    maxHealth = 100.0f;

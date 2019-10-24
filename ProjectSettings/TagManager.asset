@@ -50,3 +50,6 @@ TagManager:
   - name: Character
     uniqueID: 4200538167
     locked: 0
+  - name: CharacterGhost
+    uniqueID: 3187382713
+    locked: 0

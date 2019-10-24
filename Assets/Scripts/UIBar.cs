@@ -7,7 +7,6 @@ public class UIBar : MonoBehaviour
 {
     public enum Mode { None, Health, Dash };
 
-    public Mode         mode;
     public Image        outlineRef;
     public Image        barRef;
     public Character    character;
@@ -16,6 +15,10 @@ public class UIBar : MonoBehaviour
     float           alpha;
     float           targetAlpha;
     RectTransform   rectTransform;
+    float           prevHealth;
+    float           prevDash;
+    float           fadeTime;
+    float           targetValue;
 
     // Start is called before the first frame update
     void Start()
@@ -24,32 +27,60 @@ public class UIBar : MonoBehaviour
         rectTransform = GetComponent<RectTransform>();
         canvasGroup.alpha = alpha = targetAlpha = 0.0f;
         outlineRef.color = character.playerColor;
+        prevHealth = character.health;
+        prevDash = character.dashCharge;
+        targetValue = 0.0f;
     }
 
     // Update is called once per frame
     void Update()
     {
-        Color color = Color.white;
-        float value = 0.0f;
+        Color color = barRef.color;
+        float currentValue = barRef.rectTransform.localScale.x;
 
-        switch (mode)
+        bool    dashChange = false;
+        bool    healthChange = false;
+        float   changeSpeed = 1.0f;
+
+        if (prevDash != character.dashCharge) dashChange = true;
+        if (prevHealth != character.health) healthChange = true;
+
+        if (dashChange)
         {
-            case Mode.None:
-                targetAlpha = 0.0f;
-                break;
-            case Mode.Health:
-                targetAlpha = 1.0f;
-                color = character.gameParams.healthBarColor;
-                value = character.health / character.gameParams.maxHealth;
-                break;
-            case Mode.Dash:
-                targetAlpha = 1.0f;
-                color = character.gameParams.dashBarColor;
-                value = character.dashCharge / character.gameParams.maxDashCharge;
-                break;
-            default:
-                break;
+            targetAlpha = 1.0f;
+            color = character.gameParams.dashBarColor;
+            targetValue = character.dashCharge / character.gameParams.maxDashCharge;
+            prevDash = character.dashCharge;
+
+            fadeTime = 0.25f;
         }
+        else if (healthChange)
+        {
+            currentValue = prevHealth;
+            targetAlpha = 1.0f;
+            color = character.gameParams.healthBarColor;
+            targetValue = character.health / character.gameParams.maxHealth;
+            prevHealth = character.health;
+            changeSpeed = 0.1f;
+
+            fadeTime = 2.0f;
+        }
+        else
+        {
+            if (Mathf.Abs(currentValue - targetValue) < 1.0f)
+            {
+                if (fadeTime > 0)
+                {
+                    fadeTime -= Time.deltaTime;
+                }
+                else
+                {
+                    targetAlpha = 0.0f;
+                }
+            }
+        }
+
+        currentValue = currentValue + (targetValue - currentValue) * changeSpeed;
 
         alpha = Mathf.Clamp01(alpha + (targetAlpha - alpha) * 0.1f);
         canvasGroup.alpha = alpha;
@@ -58,7 +89,7 @@ public class UIBar : MonoBehaviour
         {
             barRef.color = color;
 
-            barRef.rectTransform.localScale = new Vector3(value, 1.0f, 1.0f);
+            barRef.rectTransform.localScale = new Vector3(currentValue, 1.0f, 1.0f);
         }
 
         transform.position = character.barAnchor.position;
