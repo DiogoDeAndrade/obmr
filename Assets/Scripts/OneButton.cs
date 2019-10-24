@@ -72,6 +72,14 @@ public class OneButton
         {
             foreach (KeyCode vKey in System.Enum.GetValues(typeof(KeyCode)))
             {
+                string keyName = vKey.ToString();
+
+                if (keyName.StartsWith("JoystickButton"))
+                {
+                    // Ignore these, because they are also mapped as Joystick1Button*
+                    continue;
+                }
+
                 if (Input.GetKey(vKey))
                 {
                     // Check if this key is already in use
@@ -93,6 +101,8 @@ public class OneButton
                         b.key = vKey;
 
                         currentButtons.Add(b);
+
+                        Debug.Log("Added " + b.key);
 
                         return b;
                     }
