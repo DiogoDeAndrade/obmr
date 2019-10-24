@@ -4862,6 +4862,7 @@ MonoBehaviour:
   scoreGain: 20
   healthGain: 0
   gameParams: {fileID: 11400000, guid: 6c8f90ead50a4da4a8414c8e96224b39, type: 2}
+  sound: {fileID: 8300000, guid: de3784cd416efbc42b730fb359929db4, type: 3}
 --- !u!212 &8913848998940845609
 SpriteRenderer:
   m_ObjectHideFlags: 0

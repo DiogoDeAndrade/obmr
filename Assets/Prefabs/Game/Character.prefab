@@ -19897,6 +19897,9 @@ MonoBehaviour:
   dashRenderer: {fileID: 5817812535132406852}
   ghostCharacter: {fileID: 5048534565648433854}
   hitCollider: {fileID: 4178190894633888978}
+  jumpSound: {fileID: 8300000, guid: ffa19d304410f80468d93586fe875305, type: 3}
+  chargeSound: {fileID: 8300000, guid: ccea80b2d3545d241bc0198e47ebb70a, type: 3}
+  overchargeSound: {fileID: 8300000, guid: 71349b031e066e94a8d872d3e0ad64c6, type: 3}
   health: 0
   speed: 0
   playerId: 0

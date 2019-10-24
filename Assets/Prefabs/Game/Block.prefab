@@ -78,6 +78,7 @@ MonoBehaviour:
     m_Mode: 0
     m_NumColorKeys: 7
     m_NumAlphaKeys: 2
+  sound: {fileID: 8300000, guid: 3b8a42e105ff70a459f7140e4fd615b2, type: 3}
 --- !u!212 &8919758904888129113
 SpriteRenderer:
   m_ObjectHideFlags: 0

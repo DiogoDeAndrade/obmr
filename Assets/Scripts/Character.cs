@@ -22,6 +22,10 @@ public class Character : MonoBehaviour
     public TrailRenderer    dashRenderer;
     public GhostCharacter   ghostCharacter;
     public Collider2D       hitCollider;
+    [Header("Audio")]
+    public AudioClip        jumpSound;
+    public AudioClip        chargeSound;
+    public AudioClip        overchargeSound;
     [Header("Runtime")]
     public OneButton    button;
     public float        health;
@@ -41,6 +45,7 @@ public class Character : MonoBehaviour
     float           invulnerabilityTimer = 0.0f;
     Collider2D      mainCollider;
     Coroutine       dropDownCR;
+    AudioSource     chargeSoundInstance;
 
     // Start is called before the first frame update
     void Start()
@@ -125,6 +130,7 @@ public class Character : MonoBehaviour
         {
             if (jumpCount > 0)
             {
+                SoundManager.PlaySound(SoundManager.SoundType.SoundFX, jumpSound, 0.25f, Random.Range(0.75f, 1.25f));
                 jumpParticleSystem.Play();
 
                 currentVelocity = new Vector2(0.0f, gameParams.jumpVelocity);
@@ -304,6 +310,8 @@ public class Character : MonoBehaviour
     {
         if (IsInvulnerable()) return;
 
+        EnableChargeFX(false);
+
         health = Mathf.Clamp(health - damage, 0, gameParams.maxHealth);
 
         if (health <= 0)
@@ -413,6 +421,7 @@ public class Character : MonoBehaviour
         ghostCharacter.RunShock();
         explodeParticleSystem.Play();
         burstParticleSystem.Play();
+        SoundManager.PlaySound(SoundManager.SoundType.SoundFX, overchargeSound, 1.0f, Random.Range(0.75f, 1.25f));
         CameraCtrl.Shake(0.15f, 50.0f);
     }
 
@@ -437,6 +446,22 @@ public class Character : MonoBehaviour
     {
         var emission = chargeParticleSystem.emission;
         emission.enabled = b;
+
+        if (b)
+        {
+            if (chargeSoundInstance == null)
+            {
+                chargeSoundInstance = SoundManager.PlaySound(SoundManager.SoundType.SoundFX, chargeSound, 0.7f, Random.Range(0.75f, 1.25f));
+            }
+        }
+        else
+        {
+            if (chargeSoundInstance)
+            {
+                chargeSoundInstance.Stop();
+                chargeSoundInstance = null;
+            }
+        }
     }
     #endregion
 }

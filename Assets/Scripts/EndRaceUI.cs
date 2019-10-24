@@ -9,6 +9,7 @@ public class EndRaceUI : MonoBehaviour
     public Transform[]          placements;
     public GameObject           placementPrefab;
     public RectTransform        placementContainer;
+    public AudioClip            badgeHitSound;
 
     bool                awardedBadges = false;
     List<GameObject>    tempObjects;
@@ -89,6 +90,11 @@ public class EndRaceUI : MonoBehaviour
             p.transform.SetParent(placementContainer, true);
             p.transform.localScale = Vector3.one;
             p.GetComponentInChildren<TextMeshProUGUI>().text = "" + (i + 1);
+
+            if (badgeHitSound)
+            {
+                SoundManager.PlaySound(SoundManager.SoundType.SoundFX, badgeHitSound, 1.0f, 1.0f - 0.05f * i);
+            }
 
             tempObjects.Add(p);
 

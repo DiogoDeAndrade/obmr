@@ -400,8 +400,11 @@ MonoBehaviour:
   eyeLeft: {fileID: 2643428531493579060}
   eyeRight: {fileID: 2643428530900302558}
   scoreText: {fileID: 2643428530197622515}
+  tickSound: {fileID: 8300000, guid: 464521f10d351094aa8209773622a7f7, type: 3}
   score: 0
   scoreUpdateTime: 0
+  targetX: 0
+  lookTarget: {x: 0, y: 0}
 --- !u!1 &2643428530900302552
 GameObject:
   m_ObjectHideFlags: 0

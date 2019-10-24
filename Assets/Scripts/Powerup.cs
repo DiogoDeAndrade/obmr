@@ -10,6 +10,7 @@ public class Powerup : MonoBehaviour
     public float            scoreGain;
     public float            healthGain;
     public GameParams       gameParams;
+    public AudioClip        sound;
 
     float           cameraLimitX;
     SpriteRenderer  sprite;
@@ -54,6 +55,8 @@ public class Powerup : MonoBehaviour
 
             character.Heal(healthGain);
             character.score += scoreGain;
+
+            SoundManager.PlaySound(SoundManager.SoundType.SoundFX, sound, 0.5f, Random.Range(0.8f, 1.2f));
         }
     }
 

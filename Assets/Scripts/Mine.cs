@@ -6,6 +6,7 @@ public class Mine : MonoBehaviour
 {
     public GameParams       gameParams;
     public Gradient         colors;
+    public AudioClip        sound;
 
     float           cameraLimitX;
     SpriteRenderer  sprite;
@@ -56,6 +57,7 @@ public class Mine : MonoBehaviour
             GetComponentInChildren<Animator>().SetTrigger("Explode");
             character.DealDamage(gameParams.mineDamage);
             CameraCtrl.Shake(0.15f, 40.0f);
+            SoundManager.PlaySound(SoundManager.SoundType.SoundFX, sound, 1.0f, Random.Range(0.8f, 1.2f));
         }
     }
 

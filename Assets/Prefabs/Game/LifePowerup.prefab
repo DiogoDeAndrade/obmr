@@ -52,6 +52,7 @@ MonoBehaviour:
   scoreGain: 5
   healthGain: 5
   gameParams: {fileID: 11400000, guid: 6c8f90ead50a4da4a8414c8e96224b39, type: 2}
+  sound: {fileID: 8300000, guid: 0f6850bc103014140af5d02bc02d9ef6, type: 3}
 --- !u!212 &6572291746101586554
 SpriteRenderer:
   m_ObjectHideFlags: 0

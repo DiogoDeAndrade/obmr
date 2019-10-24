@@ -28,7 +28,7 @@ public class SoundManager : MonoBehaviour
         GetComponentsInChildren<AudioSource>(true, audioSources);
     }
 
-    void _PlaySound(SoundType type, AudioClip sound, float volume = 1.0f, float pitch = 1.0f)
+    AudioSource _PlaySound(SoundType type, AudioClip sound, float volume = 1.0f, float pitch = 1.0f)
     {
         foreach (var audioSource in audioSources)
         {
@@ -39,7 +39,7 @@ public class SoundManager : MonoBehaviour
                 audioSource.volume = volume;
                 audioSource.pitch = pitch;
                 audioSource.Play();
-                return;
+                return audioSource;
             }
         }
 
@@ -54,6 +54,8 @@ public class SoundManager : MonoBehaviour
         snd.Play();
 
         audioSources.Add(snd);
+
+        return snd;
     }
 
     AudioMixerGroup GetMixer(SoundType type)
@@ -69,10 +71,10 @@ public class SoundManager : MonoBehaviour
         return null;
     }
 
-    public static void PlaySound(SoundType type, AudioClip sound, float volume = 1.0f, float pitch = 1.0f)
+    public static AudioSource PlaySound(SoundType type, AudioClip sound, float volume = 1.0f, float pitch = 1.0f)
     {
-        if (instance == null) return;
+        if (instance == null) return null;
 
-        instance._PlaySound(type, sound, volume, pitch);
+        return instance._PlaySound(type, sound, volume, pitch);
     }
 }

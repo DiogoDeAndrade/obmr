@@ -12,13 +12,14 @@ public class CharacterUI : MonoBehaviour
     public Image            eyeLeft;
     public Image            eyeRight;
     public TextMeshProUGUI  scoreText;
+    public AudioClip        tickSound;
 
     public int              score;
     public float            scoreUpdateTime;
     public float            targetX;
     public Vector2          lookTarget = Vector2.zero;
 
-    Image   playerBaseSprite;
+    Image playerBaseSprite;
     Vector2 currentEyeDir;
         
     void Start()
@@ -56,7 +57,16 @@ public class CharacterUI : MonoBehaviour
         if (scoreUpdateTime <= 0.0f)
         {
             int inc = Random.Range(10, 100);
-            score = Mathf.FloorToInt(Mathf.Clamp(score + inc, 0, character.score));
+            int newScore = Mathf.FloorToInt(Mathf.Clamp(score + inc, 0, character.score));
+
+            if (newScore != score)
+            {
+                score = newScore;
+
+                float t = score / character.score;
+
+                if (tickSound) SoundManager.PlaySound(SoundManager.SoundType.SoundFX, tickSound, 0.15f, 0.9f + t * 0.2f);
+            }
 
             scoreText.text = string.Format("{0:000000}", score);
 

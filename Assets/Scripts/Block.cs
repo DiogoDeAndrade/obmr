@@ -6,6 +6,7 @@ public class Block : MonoBehaviour
 {
     public GameParams       gameParams;
     public Gradient         colors;
+    public AudioClip        sound;
 
     float           cameraLimitX;
     SpriteRenderer  sprite;
@@ -58,6 +59,7 @@ public class Block : MonoBehaviour
             GetComponentInChildren<Animator>().SetTrigger("Explode");
             character.DealDamage(gameParams.blockDamage);
             CameraCtrl.Shake(0.1f, 20.0f);
+            SoundManager.PlaySound(SoundManager.SoundType.SoundFX, sound, 1.0f, Random.Range(0.8f, 1.2f));
         }
     }
 
