@@ -183,6 +183,25 @@ public class Character : MonoBehaviour
                 dashRenderer.emitting = false;
         }
 
+        if (currentVelocity.y < 0)
+        {
+            collider = Physics2D.OverlapCircle(groundCheck.transform.position, 20.0f, LayerMask.GetMask("Character"));
+            if (collider != null)
+            {
+                Character otherCharacter = collider.GetComponent<Character>();
+                if ((otherCharacter) && (otherCharacter != this))
+                {
+                    currentVelocity.y = gameParams.jumpVelocity;
+                    jumpParticleSystem.Play();
+                    score += gameParams.hitOnHeadScore;
+
+                    otherCharacter.DealDamage(gameParams.hitOnHeadDamage);
+                    otherCharacter.RunOvercharge();
+                    otherCharacter.ChangeSpeed(-gameParams.hitOnHeadSpeedDown);
+                }
+            }
+        }
+
         rigidBody.velocity = currentVelocity;
     }
 

@@ -74,6 +74,13 @@ public class Fader : MonoBehaviour
         }
         targetAlpha = alpha;
         speed = Mathf.Abs(targetAlpha - currentColor.a) / time;
-        callback = callbackOnEnd;
+        if (speed == 0.0f)
+        {
+            callbackOnEnd();
+        }
+        else
+        {
+            callback = callbackOnEnd;
+        }
     }
 }

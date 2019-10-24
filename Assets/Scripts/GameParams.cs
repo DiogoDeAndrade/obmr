@@ -47,4 +47,8 @@ public class GameParams : ScriptableObject
     public float mineInterval = 0.25f;
     public float mineProbability = 1.0f;
     public float mineProbabilityOverTime = 0.0f;
+    [Header("Player Interaction")]
+    public float hitOnHeadScore = 200.0f;
+    public float hitOnHeadDamage = 30;
+    public float hitOnHeadSpeedDown = 1000.0f;
 }

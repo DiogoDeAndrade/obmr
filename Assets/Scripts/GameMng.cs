@@ -154,6 +154,15 @@ public class GameMng : MonoBehaviour
         time.text = string.Format("{0:0}", Mathf.Clamp(Mathf.FloorToInt(gameParams.raceTime - raceTime), 0, gameParams.raceTime));
 
         OneButton.UpdateButtons();
+
+        if ((Input.GetKey(KeyCode.Escape)) && (Input.GetKey(KeyCode.LeftShift)))
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
     }
 
     void UpdateScore()

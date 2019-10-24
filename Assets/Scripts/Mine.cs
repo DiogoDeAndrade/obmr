@@ -39,7 +39,7 @@ public class Mine : MonoBehaviour
         if (tColor > 1.0f) tColor -= 1.0f;
         sprite.color = colors.Evaluate(tColor);
 
-        transform.Rotate(0.0f, 0.0f, Time.deltaTime * 2.0f);
+        transform.Rotate(0.0f, 0.0f, Time.deltaTime * 360.0f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
