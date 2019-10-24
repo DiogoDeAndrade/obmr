@@ -66,6 +66,8 @@ public class GameMng : MonoBehaviour
 
     void Start()
     {
+        Cursor.visible = false;
+
         backgroundLayers = FindObjectsOfType<BackgroundManager>();
         platforms = new Platform[gameParams.platformHeight.Length];
         blockProbability = gameParams.blockProbability;
