@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameParams : ScriptableObject
 {
     public float maxSpeed = 2000.0f;
+    public float raceTime = 120;
     [Header("Passive acceleration")]
     public float    acceleration = 500.0f;
     public float    breakVelocity = 200.0f;
@@ -34,4 +35,16 @@ public class GameParams : ScriptableObject
     public Vector2  platformWidthRange = new Vector2(1280 * 10, 1280 * 30);
     public float[]  platformHeight;
     public float    platformProbability = 1.0f;
+    [Header("Blocks")]
+    public float    blockDamage = 15.0f;
+    public float    blockStartTime = 5.0f;
+    public float    blockInterval = 0.25f;
+    public float    blockProbability = 1.0f;
+    public float    blockProbabilityOverTime = 0.0f;
+    [Header("Mines")]
+    public float mineDamage = 15.0f;
+    public float mineStartTime = 5.0f;
+    public float mineInterval = 0.25f;
+    public float mineProbability = 1.0f;
+    public float mineProbabilityOverTime = 0.0f;
 }

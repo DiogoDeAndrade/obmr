@@ -30,4 +30,9 @@ public class GhostCharacter : MonoBehaviour
     {
         anim.SetTrigger("Shock");
     }
+
+    public void RunSpin()
+    {
+        anim.SetTrigger("Spin");
+    }
 }

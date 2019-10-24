@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    public float    scrollScale = 1.1f;
     public Vector2  size = new Vector2(1024, 32);
 
     SpriteRenderer sprite;
@@ -16,9 +15,9 @@ public class Platform : MonoBehaviour
         cameraLimitX = GameMng.instance.GetPlayfieldLimitX();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        float speed = GameMng.instance.GetCurrentSpeed() * scrollScale * Time.deltaTime;
+        float speed = GameMng.instance.GetCurrentSpeed() * GameMng.instance.layer0ScrollSpeed * Time.fixedDeltaTime;
 
         var currentPos = transform.position;
         currentPos.x -= speed;
@@ -36,6 +35,7 @@ public class Platform : MonoBehaviour
         sprite.size = new Vector2(width, sprite.size.y);
 
         BoxCollider2D collider = GetComponent<BoxCollider2D>();
+        collider.offset = new Vector2(width * 0.5f, 0.0f);
         collider.size = new Vector2(width, collider.size.y);
 
         size = new Vector2(width, sprite.size.y);

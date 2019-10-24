@@ -80,7 +80,7 @@ public class UIBar : MonoBehaviour
             }
         }
 
-        currentValue = currentValue + (targetValue - currentValue) * changeSpeed;
+        currentValue = Mathf.Clamp01(currentValue + (targetValue - currentValue) * changeSpeed);
 
         alpha = Mathf.Clamp01(alpha + (targetAlpha - alpha) * 0.1f);
         canvasGroup.alpha = alpha;

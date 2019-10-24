@@ -17,8 +17,8 @@ TagManager:
   - Character
   - Ground
   - Wall
-  - 
-  - 
+  - Blocks
+  - CharacterHit
   - 
   - 
   - 

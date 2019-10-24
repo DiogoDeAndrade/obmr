@@ -20,6 +20,7 @@ public class Character : MonoBehaviour
     public Transform        barAnchor;
     public TrailRenderer    dashRenderer;
     public GhostCharacter   ghostCharacter;
+    public Collider2D       hitCollider;
     [Header("Runtime")]
     public OneButton    button;
     public float        health;
@@ -28,6 +29,7 @@ public class Character : MonoBehaviour
     public float        score = 0.0f;
     public float        dashCharge = 0.0f;
     public UIBar        uiBar;
+    public bool         isDead = false;
 
     SpriteRenderer  playerBaseSprite;
     Vector2         currentEyeDir;
@@ -68,7 +70,15 @@ public class Character : MonoBehaviour
                 EyesLookRandom();
                 break;
             case GameMng.GameState.Playing:
-                Play();
+                if (!isDead)
+                {
+                    Play();
+                }
+                break;
+            case GameMng.GameState.End:
+                {
+                    rigidBody.velocity = new Vector2(1000.0f, rigidBody.velocity.y);
+                }
                 break;
             default:
                 break;
@@ -129,7 +139,7 @@ public class Character : MonoBehaviour
                         canDash = false;
 
                         speed = speed - gameParams.overchargePenaltySpeed;
-                        health = health - gameParams.overchargeDamage;
+                        DealDamage(gameParams.overchargeDamage);
 
                         RunOvercharge();
                     }
@@ -179,6 +189,34 @@ public class Character : MonoBehaviour
     void ChangeSpeed(float deltaSpeed)
     {
         speed = Mathf.Clamp(speed + deltaSpeed, 0, gameParams.maxSpeed);
+    }
+
+    public void DealDamage(float damage)
+    {
+        health -= damage;
+
+        if (health <= 0)
+        {
+            isDead = true;
+            rigidBody.velocity = new Vector2(rigidBody.velocity.x, gameParams.jumpVelocity * 1.0f);
+
+            HideChar();
+            EnableColliders(false);
+        }
+    }
+
+    public void EnableColliders(bool b)
+    {
+        var colliders = GetComponents<Collider2D>();
+        foreach (var collider in colliders)
+        {
+            collider.enabled = b;
+        }
+    }
+
+    public void EnableHit(bool b)
+    {
+        hitCollider.enabled = b;
     }
 
     #region Eyes
@@ -263,6 +301,23 @@ public class Character : MonoBehaviour
         explodeParticleSystem.Play();
         burstParticleSystem.Play();
         CameraCtrl.Shake(0.15f, 50.0f);
+    }
+
+    void HideChar()
+    {
+        var sprites = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sprite in sprites)
+        {
+            sprite.enabled = false;
+        }
+
+        sprites = ghostCharacter.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sprite in sprites)
+        {
+            sprite.enabled = true;
+        }
+
+        ghostCharacter.RunSpin();
     }
     #endregion
 }

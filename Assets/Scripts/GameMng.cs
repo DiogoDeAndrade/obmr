@@ -6,7 +6,10 @@ using UnityEngine;
 public class GameMng : MonoBehaviour
 {
     public Camera       baseCamera;
+    public Fader        globalFader;
     public GameParams   gameParams;
+    public float        layer0ScrollSpeed = 1.05f;
+    public GameObject   walls;
     [Header("Title")]
     public GameObject[] titleElements;
     [Header("Prepare")]
@@ -16,6 +19,10 @@ public class GameMng : MonoBehaviour
     public AudioClip       countdownSound;
     public AudioClip       countdownDone;
     public AudioClip       playerJoinSound;
+    [Header("UI")]
+    public TextMeshProUGUI      time;
+    public Fader                fader;
+    public EndRaceUI            endRaceUI;
     [Header("Players")]
     public Character            characterPrefab;
     public Transform[]          playerSpawnPoint;
@@ -24,10 +31,14 @@ public class GameMng : MonoBehaviour
     public UIBar[]              uiBars;
     [Header("Platforms")]
     public Platform             platformPrefab;
+    [Header("Blocks")]
+    public Block                blockPrefab;
+    [Header("Mines")]
+    public Mine                 minePrefab;
 
     public static GameMng instance;
 
-    public enum GameState { Title, Prepare, Playing };
+    public enum GameState { Title, Prepare, Playing, End };
 
     [HideInInspector]
     public GameState           gameState = GameState.Title;
@@ -38,7 +49,12 @@ public class GameMng : MonoBehaviour
     float                      minSpeed = 0.0f;
     float                      raceTime = 0.0f;
     float                      platformSpawnTimer = 0.0f;
+    float                      blockSpawnTimer = 0.0f;
+    float                      blockProbability;
     Platform[]                 platforms;
+    float                      mineSpawnTimer = 0.0f;
+    float                      mineProbability = 0.0f;
+    bool                       canStart = false;
 
     private void Awake()
     {
@@ -49,6 +65,7 @@ public class GameMng : MonoBehaviour
     {
         backgroundLayers = FindObjectsOfType<BackgroundManager>();
         platforms = new Platform[gameParams.platformHeight.Length];
+        blockProbability = gameParams.blockProbability;
         StartTitle();
     }
 
@@ -63,18 +80,10 @@ public class GameMng : MonoBehaviour
         return -1;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void FixedUpdate()
     {
         switch (gameState)
         {
-            case GameState.Title:
-                WaitPlayer();
-                break;
-            case GameState.Prepare:
-                WaitPlayer();
-                RunCountdown();
-                break;
             case GameState.Playing:
                 {
                     ComputeMinSpeed();
@@ -83,25 +92,66 @@ public class GameMng : MonoBehaviour
 
                     currentSpeed += (desiredSpeed - currentSpeed) * 0.2f;
 
-                    raceTime += Time.deltaTime;
-
                     SetGlobalSpeed(currentSpeed);
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
-                    UpdateScore();
+    // Update is called once per frame
+    void Update()
+    {
+        switch (gameState)
+        {
+            case GameState.Title:
+                if (canStart) WaitPlayer();
+                break;
+            case GameState.Prepare:
+                WaitPlayer();
+                RunCountdown();
+                break;
+            case GameState.Playing:
+                {
+                    bool allDead = true;
+                    foreach (var player in players)
+                    {
+                        if (!player.isDead) allDead = false;
+                    }
 
-                    UpdatePlatforms();
+                    if (allDead)
+                    {
+                        EndRace();
+                    }
+                    else
+                    {
+                        raceTime += Time.deltaTime;
+                        if (raceTime >= gameParams.raceTime)
+                        {
+                            EndRace();
+                        }
+                        else
+                        {
+                            UpdateScore();
+
+                            UpdatePlatforms();
+                            UpdateBlocks();
+                            UpdateMines();
+                        }
+                    }
                 }
                 break;
             default:
                 break;
         }
 
-        
-
         for (int i = 0; i < players.Count; i++)
         {
             playerScores[i].text = string.Format("{0:000000}", Mathf.FloorToInt(players[i].score));
         }
+
+        time.text = string.Format("{0:0}", Mathf.Clamp(Mathf.FloorToInt(gameParams.raceTime - raceTime), 0, gameParams.raceTime));
 
         OneButton.UpdateButtons();
     }
@@ -116,6 +166,8 @@ public class GameMng : MonoBehaviour
 
         foreach (var c in positions)
         {
+            if (c.isDead) continue;
+
             c.score += multiplier * Time.deltaTime;
             multiplier *= 0.75f;
         }
@@ -185,8 +237,12 @@ public class GameMng : MonoBehaviour
         SoundManager.PlaySound(SoundManager.SoundType.SoundFX, playerJoinSound, 1, 1 + 0.05f * players.Count);
     }
 
-    void StartTitle()
+    public void StartTitle()
     {
+        endRaceUI.gameObject.SetActive(false);
+
+        canStart = false;
+
         if (players != null)
         {
             foreach (var p in players)
@@ -207,6 +263,12 @@ public class GameMng : MonoBehaviour
             bar.gameObject.SetActive(false);
         }
         SetGlobalSpeed(4000.0f);
+
+        globalFader.FadeTo(0.0f, 0.5f,
+        () =>
+        {
+            canStart = true;
+        });
     }
 
     void StartPrepare()
@@ -215,12 +277,15 @@ public class GameMng : MonoBehaviour
         timeToStart = 10;
         EnableMenu(false);
         SetGlobalSpeed(0.0f);
+        raceTime = 0;
+        EnableWalls(true);
     }
 
     void StartRunning()
     {
         gameState = GameState.Playing;
         raceTime = 0.0f;
+        time.enabled = true;
         foreach (var player in players)
         {
             player.speed = 800.0f;
@@ -234,6 +299,8 @@ public class GameMng : MonoBehaviour
         {
             te.SetActive(b);
         }
+
+        time.enabled = false;
     }
 
     void SetGlobalSpeed(float speed)
@@ -247,12 +314,16 @@ public class GameMng : MonoBehaviour
 
     void ComputeMinSpeed()
     {
-        minSpeed = players[0].speed;
+        minSpeed = float.MaxValue;
 
         foreach (var player in players)
         {
+            if (player.isDead) continue;
+
             minSpeed = Mathf.Min(minSpeed, player.speed);
         }
+
+        if (minSpeed == float.MaxValue) minSpeed = 0.0f;
     }
 
     public float GetMinSpeed()
@@ -294,5 +365,99 @@ public class GameMng : MonoBehaviour
 
         platforms[r] = Instantiate(platformPrefab, pos, Quaternion.identity);
         platforms[r].SetWidth(Random.Range(gameParams.platformWidthRange.x, gameParams.platformWidthRange.y));
+    }
+
+    void UpdateBlocks()
+    {
+        if (raceTime < gameParams.blockStartTime) return;
+
+        blockSpawnTimer -= Time.deltaTime;
+        blockProbability += gameParams.blockProbabilityOverTime * Time.deltaTime;
+
+        if (blockSpawnTimer > 0) return;
+
+        blockSpawnTimer = gameParams.blockInterval;
+
+        int platformCount = 1;
+        for (int i = 0; i < platforms.Length; i++)
+        {
+            if (platforms[i]) platformCount++;
+        }
+
+        float actualProbability = platformCount * blockProbability;
+
+        float p = Random.Range(0.0f, 1.0f);
+
+        if (p > actualProbability) return;
+
+        int r = Random.Range(0, platforms.Length);
+
+        float x = GetPlayfieldLimitX();
+
+        if (platforms[r] != null)
+        {
+            if (platforms[r].transform.position.x + platforms[r].size.x < x)
+            {
+                r = -1;
+            }
+        }
+        else
+        {
+            r = -1;
+        }
+
+        float y = (r == -1) ? (-320) : (gameParams.platformHeight[r]);
+
+        // Spawn block
+        Vector3 pos = new Vector3(x, y + 32.0f, 0.0f);
+
+        Instantiate(blockPrefab, pos, Quaternion.identity);
+    }
+
+    void UpdateMines()
+    {
+        if (raceTime < gameParams.mineStartTime) return;
+
+        mineSpawnTimer -= Time.deltaTime;
+        mineProbability += gameParams.mineProbabilityOverTime * Time.deltaTime;
+
+        if (mineSpawnTimer > 0) return;
+
+        float p = Random.Range(0.0f, 1.0f);
+
+        if (p > mineProbability) return;
+
+        mineSpawnTimer = gameParams.mineInterval;
+
+        float x = GetPlayfieldLimitX() * 0.5f;
+        x = Random.Range(0, x);
+
+        Vector3 pos = new Vector3(x, baseCamera.transform.position.y + baseCamera.orthographicSize + 50.0f, 0.0f);
+
+        Instantiate(minePrefab, pos, Quaternion.identity);
+    }
+
+    void EndRace()
+    {
+        gameState = GameState.End;
+        foreach (var player in players)
+        {
+            player.EnableHit(false);
+        }
+        EnableWalls(false);
+        fader.FadeTo(0.75f, 1.0f,
+        () =>
+        {
+            endRaceUI.Setup(players);
+        });
+    }
+
+    void EnableWalls(bool b)
+    {
+        var wallColliders = walls.GetComponents<Collider2D>();
+        foreach (var wall in wallColliders)
+        {
+            wall.enabled = b;
+        }
     }
 }
