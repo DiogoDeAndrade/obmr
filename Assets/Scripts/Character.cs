@@ -262,7 +262,7 @@ public class Character : MonoBehaviour
         ghostCharacter.RunShock();
         explodeParticleSystem.Play();
         burstParticleSystem.Play();
-        CameraCtrl.Shake(0.25f, 50.0f);
+        CameraCtrl.Shake(0.15f, 50.0f);
     }
     #endregion
 }

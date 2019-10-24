@@ -5,7 +5,6 @@ using UnityEngine;
 public class BackgroundManager : MonoBehaviour
 {
     [Header("Building Generation")]
-    public Camera       baseCamera;
     public float        margin = 300.0f;
     public GameObject[] buildingPrefabs;
     public Vector2      widthRange;
@@ -25,7 +24,8 @@ public class BackgroundManager : MonoBehaviour
     {
         buildings = new List<SpriteRenderer>();
         buildingsToDelete = new List<SpriteRenderer>();
-        cameraLimitX = baseCamera.aspect * baseCamera.orthographicSize;
+
+        cameraLimitX = GameMng.instance.GetPlayfieldLimitX();
 
         GenStartingBuildings();
     }

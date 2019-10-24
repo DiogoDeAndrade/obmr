@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameMng : MonoBehaviour
 {
+    public Camera       baseCamera;
+    public GameParams   gameParams;
     [Header("Title")]
     public GameObject[] titleElements;
     [Header("Prepare")]
@@ -20,6 +22,8 @@ public class GameMng : MonoBehaviour
     public Color[]              playerColors;
     public TextMeshProUGUI[]    playerScores;
     public UIBar[]              uiBars;
+    [Header("Platforms")]
+    public Platform             platformPrefab;
 
     public static GameMng instance;
 
@@ -32,6 +36,9 @@ public class GameMng : MonoBehaviour
     BackgroundManager[]        backgroundLayers;
     float                      currentSpeed = 0.0f;
     float                      minSpeed = 0.0f;
+    float                      raceTime = 0.0f;
+    float                      platformSpawnTimer = 0.0f;
+    Platform[]                 platforms;
 
     private void Awake()
     {
@@ -41,6 +48,7 @@ public class GameMng : MonoBehaviour
     void Start()
     {
         backgroundLayers = FindObjectsOfType<BackgroundManager>();
+        platforms = new Platform[gameParams.platformHeight.Length];
         StartTitle();
     }
 
@@ -75,9 +83,13 @@ public class GameMng : MonoBehaviour
 
                     currentSpeed += (desiredSpeed - currentSpeed) * 0.2f;
 
+                    raceTime += Time.deltaTime;
+
                     SetGlobalSpeed(currentSpeed);
 
                     UpdateScore();
+
+                    UpdatePlatforms();
                 }
                 break;
             default:
@@ -194,6 +206,7 @@ public class GameMng : MonoBehaviour
         {
             bar.gameObject.SetActive(false);
         }
+        SetGlobalSpeed(4000.0f);
     }
 
     void StartPrepare()
@@ -207,6 +220,7 @@ public class GameMng : MonoBehaviour
     void StartRunning()
     {
         gameState = GameState.Playing;
+        raceTime = 0.0f;
         foreach (var player in players)
         {
             player.speed = 800.0f;
@@ -249,5 +263,36 @@ public class GameMng : MonoBehaviour
     public float GetCurrentSpeed()
     {
         return currentSpeed;
+    }
+
+    public float GetPlayfieldLimitX()
+    {
+        return baseCamera.aspect* baseCamera.orthographicSize;
+    }
+
+    void UpdatePlatforms()
+    {
+        if (raceTime < gameParams.platformStartTime) return;
+
+        platformSpawnTimer -= Time.deltaTime;
+
+        if (platformSpawnTimer > 0) return;
+
+        platformSpawnTimer = 1.0f;
+
+        int r = Random.Range(0, platforms.Length);
+
+        if (platforms[r] != null) return;
+
+        float p = Random.Range(0.0f, 1.0f);
+
+        if (p > gameParams.platformProbability) return;
+
+        // Spawn platform
+
+        Vector3 pos = new Vector3(GetPlayfieldLimitX(), gameParams.platformHeight[r], 0.0f);
+
+        platforms[r] = Instantiate(platformPrefab, pos, Quaternion.identity);
+        platforms[r].SetWidth(Random.Range(gameParams.platformWidthRange.x, gameParams.platformWidthRange.y));
     }
 }

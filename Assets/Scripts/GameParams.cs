@@ -29,4 +29,9 @@ public class GameParams : ScriptableObject
     [Header("Health")]
     public Color    healthBarColor = Color.green;
     public float    maxHealth = 100.0f;
+    [Header("Platforms")]
+    public float    platformStartTime = 15.0f;
+    public Vector2  platformWidthRange = new Vector2(1280 * 10, 1280 * 30);
+    public float[]  platformHeight;
+    public float    platformProbability = 1.0f;
 }
