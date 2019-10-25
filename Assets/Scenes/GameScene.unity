@@ -1332,12 +1332,12 @@ PrefabInstance:
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
@@ -1899,12 +1899,12 @@ PrefabInstance:
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
@@ -2463,12 +2463,12 @@ PrefabInstance:
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
@@ -6003,12 +6003,12 @@ PrefabInstance:
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 60
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 20
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 641135411135795673, guid: 88f56d13481974f4d95dd6574ef87342,
         type: 3}

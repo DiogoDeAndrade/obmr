@@ -49,6 +49,8 @@ public class UIBar : MonoBehaviour
         {
             targetAlpha = 1.0f;
             color = character.gameParams.dashBarColor;
+            if (character.dashCharge > character.gameParams.maxDashCharge)
+                color = character.gameParams.dashBarOverloadColor;
             targetValue = character.dashCharge / character.gameParams.maxDashCharge;
             prevDash = character.dashCharge;
 
@@ -78,6 +80,11 @@ public class UIBar : MonoBehaviour
                     targetAlpha = 0.0f;
                 }
             }
+        }
+
+        if (character.isDead)
+        {
+            targetAlpha = 0.0f;
         }
 
         currentValue = Mathf.Clamp01(currentValue + (targetValue - currentValue) * changeSpeed);

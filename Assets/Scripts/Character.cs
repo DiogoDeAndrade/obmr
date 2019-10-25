@@ -46,6 +46,7 @@ public class Character : MonoBehaviour
     Collider2D      mainCollider;
     Coroutine       dropDownCR;
     AudioSource     chargeSoundInstance;
+    float           respawnTimer = 0.0f;
 
     // Start is called before the first frame update
     void Start()
@@ -79,11 +80,29 @@ public class Character : MonoBehaviour
                 break;
             case GameMng.GameState.Prepare:
                 EyesLookRandom();
+                Prepare();
                 break;
             case GameMng.GameState.Playing:
                 if (!isDead)
                 {
                     Play();
+                }
+                else
+                {
+                    if (respawnTimer > 0)
+                    {
+                        respawnTimer -= Time.deltaTime;
+                        
+                        if (respawnTimer < 0)
+                        {
+                            EnableColliders(true);
+                            health = gameParams.maxHealth;
+                            transform.position = GameMng.instance.playerSpawnPoint[0].position;
+                            speed = GameMng.instance.GetCurrentSpeed();
+                            isDead = false;
+                            ShowChar();
+                        }
+                    }
                 }
                 break;
             case GameMng.GameState.End:
@@ -94,6 +113,38 @@ public class Character : MonoBehaviour
             default:
                 break;
         }
+    }
+
+    void Prepare()
+    {
+        Collider2D collider = Physics2D.OverlapCircle(groundCheck.transform.position, 5.0f, LayerMask.GetMask("Ground"));
+        if (collider != null)
+        {
+            jumpCount = gameParams.maxJumpCount;
+            dashCharge = 0.0f;
+            canDash = true;
+        }
+
+        Vector2 currentVelocity = rigidBody.velocity;
+
+        if (button.IsTapped())
+        {
+            if (jumpCount > 0)
+            {
+                SoundManager.PlaySound(SoundManager.SoundType.SoundFX, jumpSound, 0.25f, Random.Range(0.75f, 1.25f));
+                jumpParticleSystem.Play();
+
+                currentVelocity = new Vector2(0.0f, gameParams.jumpVelocity);
+                ChangeSpeed(speed * gameParams.speedBoostJump);
+                jumpCount--;
+                rigidBody.gravityScale = 1.0f;
+                dashCharge = 0.0f;
+            }
+        }
+
+        rigidBody.velocity = currentVelocity;
+
+        invulnerabilityTimer = 2.0f;
     }
 
     void Play()
@@ -148,13 +199,13 @@ public class Character : MonoBehaviour
 
                 rigidBody.gravityScale = gameParams.gravityScaleChargeDash;
 
-                dashCharge = Mathf.Min(dashCharge + Time.deltaTime * gameParams.dashChargeSpeed, gameParams.maxDashCharge);
+                dashCharge = Mathf.Min(dashCharge + Time.deltaTime * gameParams.dashChargeSpeed, gameParams.overchargeLimit);
 
                 EnableChargeFX(true);
 
                 if (gameParams.overchargeExplode)
                 {
-                    if (dashCharge >= gameParams.maxDashCharge)
+                    if (dashCharge >= gameParams.overchargeLimit)
                     {
                         dashCharge = 0;
                         canDash = false;
@@ -189,6 +240,7 @@ public class Character : MonoBehaviour
                 canDash = false;
                 jumpCount = 0;
                 isDashing = true;
+                if (dashCharge > gameParams.maxDashCharge) dashCharge = gameParams.maxDashCharge;
                 ChangeSpeed(gameParams.speedBoostDash * speed);
                 currentVelocity.y = gameParams.jumpVelocity * 0.5f;
 
@@ -225,7 +277,7 @@ public class Character : MonoBehaviour
         {
             if (currentVelocity.y < 0)
             {
-                collider = Physics2D.OverlapCircle(groundCheck.transform.position, 20.0f, LayerMask.GetMask("Character"));
+                collider = Physics2D.OverlapCircle(groundCheck.transform.position, 30.0f, LayerMask.GetMask("Character"));
                 if (collider != null)
                 {
                     if (HitAnotherPlayer(collider, gameParams.hitOnHeadScore, gameParams.hitOnHeadDamage, gameParams.hitOnHeadSpeedDown))
@@ -321,6 +373,11 @@ public class Character : MonoBehaviour
 
             HideChar();
             EnableColliders(false);
+
+            if (gameParams.allowRespawn)
+            {
+                respawnTimer = gameParams.respawnTimer;
+            }
         }
 
         invulnerabilityTimer = 1.0f;
@@ -328,7 +385,7 @@ public class Character : MonoBehaviour
 
     public void EnableColliders(bool b)
     {
-        var colliders = GetComponents<Collider2D>();
+        var colliders = GetComponentsInChildren<Collider2D>();
         foreach (var collider in colliders)
         {
             collider.enabled = b;
@@ -423,6 +480,21 @@ public class Character : MonoBehaviour
         burstParticleSystem.Play();
         SoundManager.PlaySound(SoundManager.SoundType.SoundFX, overchargeSound, 1.0f, Random.Range(0.75f, 1.25f));
         CameraCtrl.Shake(0.15f, 50.0f);
+    }
+
+    void ShowChar()
+    {
+        var sprites = GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sprite in sprites)
+        {
+            sprite.enabled = true;
+        }
+
+        sprites = ghostCharacter.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sprite in sprites)
+        {
+            sprite.enabled = false;
+        }
     }
 
     void HideChar()

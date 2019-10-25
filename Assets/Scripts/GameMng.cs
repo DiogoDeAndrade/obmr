@@ -120,10 +120,15 @@ public class GameMng : MonoBehaviour
             case GameState.Playing:
                 {
                     bool allDead = true;
-                    foreach (var player in players)
+
+                    if (gameParams.allowRespawn)
                     {
-                        if (!player.isDead) allDead = false;
+                        foreach (var player in players)
+                        {
+                            if (!player.isDead) allDead = false;
+                        }
                     }
+                    else allDead = false;
 
                     if (allDead)
                     {

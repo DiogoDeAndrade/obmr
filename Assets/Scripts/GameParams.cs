@@ -17,6 +17,7 @@ public class GameParams : ScriptableObject
     public float    speedBoostJump = 0.1f;
     [Header("Dash")]
     public Color    dashBarColor = Color.cyan;
+    public Color    dashBarOverloadColor = Color.red;
     public float    maxDashCharge = 100.0f;
     public float    dashChargeSpeed = 100.0f;
     public float    dashDischargeSpeed = 200.0f;
@@ -27,9 +28,12 @@ public class GameParams : ScriptableObject
     public bool     overchargeExplode = true;
     public float    overchargePenaltySpeed = 1000.0f;
     public float    overchargeDamage = 0.0f;
+    public float    overchargeLimit = 120.0f;
     [Header("Health")]
     public Color    healthBarColor = Color.green;
     public float    maxHealth = 100.0f;
+    public bool     allowRespawn = true;
+    public float    respawnTimer = 5.0f;
     [Header("Platforms")]
     public float    platformStartTime = 15.0f;
     public Vector2  platformWidthRange = new Vector2(1280 * 10, 1280 * 30);
