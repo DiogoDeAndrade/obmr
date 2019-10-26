@@ -58,7 +58,7 @@ public class EndRaceUI : MonoBehaviour
 
         for (int i = 0; i < characters.Count; i++)
         {
-            characters[i].targetX = placements[i].position.x;
+            characters[i].targetPos = placements[i].position;
             if (characters[i].character)
             {
                 if (characters[i].score != Mathf.FloorToInt(characters[i].character.score))

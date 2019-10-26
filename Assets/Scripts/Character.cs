@@ -286,12 +286,12 @@ public class Character : MonoBehaviour
 
         if (!IsInvulnerable())
         {
-            if (currentVelocity.y < 0)
+            if (currentVelocity.y <= 0)
             {
-                collider = Physics2D.OverlapCircle(groundCheck.transform.position, 30.0f, LayerMask.GetMask("Character"));
-                if (collider != null)
+                var colliders = Physics2D.OverlapCircleAll(groundCheck.transform.position, 40.0f, LayerMask.GetMask("Character"));
+                foreach (var col in colliders)
                 {
-                    if (HitAnotherPlayer(collider, gameParams.hitOnHeadScore, gameParams.hitOnHeadDamage, gameParams.hitOnHeadSpeedDown))
+                    if (HitAnotherPlayer(col, gameParams.hitOnHeadScore, gameParams.hitOnHeadDamage, gameParams.hitOnHeadSpeedDown))
                     {
                         jumpParticleSystem.Play();
                         currentVelocity.y = gameParams.jumpVelocity;
@@ -547,4 +547,10 @@ public class Character : MonoBehaviour
         }
     }
     #endregion
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(groundCheck.position, 40);
+    }
 }

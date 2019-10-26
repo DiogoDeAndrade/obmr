@@ -16,7 +16,7 @@ public class CharacterUI : MonoBehaviour
 
     public int              score;
     public float            scoreUpdateTime;
-    public float            targetX;
+    public Vector2          targetPos;
     public Vector2          lookTarget = Vector2.zero;
 
     Image playerBaseSprite;
@@ -34,7 +34,7 @@ public class CharacterUI : MonoBehaviour
         {
             body.color = character.playerColor;
             scoreText.color = character.playerColor;
-            targetX = transform.position.x;
+            targetPos = transform.position;
         }
     }
 
@@ -73,8 +73,8 @@ public class CharacterUI : MonoBehaviour
             scoreUpdateTime = 0.1f;
         }
 
-        var currentPos = transform.position;
-        currentPos.x = currentPos.x + (targetX - currentPos.x) * 0.05f;
+        Vector2 currentPos = transform.position;
+        currentPos = currentPos + (targetPos - currentPos) * 0.05f;
         transform.position = currentPos;
     }
 
