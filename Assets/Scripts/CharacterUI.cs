@@ -68,7 +68,7 @@ public class CharacterUI : MonoBehaviour
                 if (tickSound) SoundManager.PlaySound(SoundManager.SoundType.SoundFX, tickSound, 0.15f, 0.9f + t * 0.2f);
             }
 
-            scoreText.text = string.Format("{0:000000}", score);
+            scoreText.text = string.Format("{0:00000}", score);
 
             scoreUpdateTime = 0.1f;
         }

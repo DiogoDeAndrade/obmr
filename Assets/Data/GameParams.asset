@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GameParams
   m_EditorClassIdentifier: 
   maxSpeed: 2500
-  raceTime: 60
+  raceTime: 90
   acceleration: 500
   breakVelocity: 400
   stdAccelerationMaxSpeed: 2000
@@ -33,10 +33,13 @@ MonoBehaviour:
   overchargePenaltySpeed: 1000
   overchargeDamage: 25
   overchargeLimit: 160
+  allowBreak: 1
+  breakAmmount: 1000
+  breakMinimum: 1000
   healthBarColor: {r: 0.1981132, g: 0.7924528, b: 0.1981132, a: 1}
   maxHealth: 100
   allowRespawn: 1
-  respawnTimer: 5
+  respawnTimer: 3
   platformStartTime: 10
   platformWidthRange: {x: 5000, y: 24000}
   platformHeight:
@@ -53,8 +56,8 @@ MonoBehaviour:
   powerupStartTime: 5
   powerupProbability: 1
   powerupRate: 5
-  mineDamage: 40
-  mineStartTime: 60
+  mineDamage: 50
+  mineStartTime: 40
   mineInterval: 1
   mineProbability: 0.4
   mineProbabilityOverTime: 0.01

@@ -58,6 +58,7 @@ public class GameMng : MonoBehaviour
     float                      mineProbability = 0.0f;
     float                      powerupSpawnTime = 0.0f;
     bool                       canStart = false;
+    float                      timeOfMainTitle = 0.0f;
 
     private void Awake()
     {
@@ -111,7 +112,7 @@ public class GameMng : MonoBehaviour
         switch (gameState)
         {
             case GameState.Title:
-                if (canStart) WaitPlayer();
+                if ((canStart) && ((Time.time - timeOfMainTitle) > 2.0f)) WaitPlayer();
                 break;
             case GameState.Prepare:
                 WaitPlayer();
@@ -159,7 +160,7 @@ public class GameMng : MonoBehaviour
 
         for (int i = 0; i < players.Count; i++)
         {
-            playerScores[i].text = string.Format("{0:000000}", Mathf.FloorToInt(players[i].score));
+            playerScores[i].text = string.Format("{0:00000}", Mathf.FloorToInt(players[i].score));
         }
 
         time.text = string.Format("{0:0}", Mathf.Clamp(Mathf.FloorToInt(gameParams.raceTime - raceTime), 0, gameParams.raceTime));
@@ -288,6 +289,7 @@ public class GameMng : MonoBehaviour
         () =>
         {
             canStart = true;
+            timeOfMainTitle = Time.time;
         });
     }
 

@@ -14,6 +14,8 @@ Currently no gameplay of any sort, just an exploration of visuals and audio aest
 * Beat detection by Allan Pichardo (https://github.com/allanpichardo/Unity-Beat-Detection)
 * Music "Infiltrators" by Nathaniel Wyvern (https://nathanielwyvern.bandcamp.com) - Used by kind permission
 * Font "Neon Glow"  by Weknow Font Foundry
+* Font "Technology" by Vladimir Nikolic
+* Font "Neon 80's" by Essqué Productions
 
 ## Licenses
 

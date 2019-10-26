@@ -177,7 +177,7 @@ public class Character : MonoBehaviour
 
         Vector2 currentVelocity = rigidBody.velocity;
 
-        if (button.IsTapped())
+        if ((button.IsTapped()) && (dashCharge <= 0.0f))
         {
             if (jumpCount > 0)
             {
@@ -223,12 +223,22 @@ public class Character : MonoBehaviour
             {
                 EnableChargeFX(false);
 
-                if ((button.GetTimeSincePress() > 0.5f) && (transform.position.y > -280.0f) && (dropDownCR == null))
+                if (button.GetTimeSincePress() > 0.5f)
                 {
-                    // Drop down
-                    dropDownCR = StartCoroutine(DropDownCR());
-                    canDash = false;
-                    currentVelocity.y = gameParams.jumpVelocity * 0.25f;
+                    if (transform.position.y > -280.0f)
+                    {
+                        if (dropDownCR == null)
+                        {
+                            // Drop down
+                            dropDownCR = StartCoroutine(DropDownCR());
+                            canDash = false;
+                            currentVelocity.y = gameParams.jumpVelocity * 0.25f;
+                        }
+                    }
+                    else if (gameParams.allowBreak)
+                    {
+                        speed = Mathf.Max(speed - Time.deltaTime * gameParams.breakAmmount, gameParams.breakMinimum);
+                    }
                 }
             }
         }
@@ -241,6 +251,7 @@ public class Character : MonoBehaviour
                 jumpCount = 0;
                 isDashing = true;
                 if (dashCharge > gameParams.maxDashCharge) dashCharge = gameParams.maxDashCharge;
+                dashCharge += 25;
                 ChangeSpeed(gameParams.speedBoostDash * speed);
                 currentVelocity.y = gameParams.jumpVelocity * 0.5f;
 
