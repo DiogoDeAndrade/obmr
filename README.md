@@ -8,6 +8,7 @@ This is a game done for the 1st Game Design Club challenge (One Button) at the U
 
 The game is a multiplayer endless runner (not really endless, since every race is 1.5 mins long).
 All player control is done through just one button:
+
 * Players choose the button by pressing it on the title screen or the prepare screen.
   * Any button can be used, keyboard, mouse, gamepad, even the controllers from Buzz (which I used on the demo)
 * Tap to jump
